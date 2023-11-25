@@ -5,6 +5,8 @@ public class CommandBean {
     private String inputPath;//输入原始文件
     private String outputPath;//输出结果文件
     private String previewFilePath;//预加载计算文件，及原始数的结果数
+    private String filterPath;//
+    private String commandsPath;//批处理条件
 
     private int mergeCount;//多少位合并为一个标识头
     private int sizeCount;//条件组多少组分为一个线程处理
@@ -90,5 +92,21 @@ public class CommandBean {
 
     public void setGenerateFilterType(int generateFilterType) {
         this.generateFilterType = generateFilterType;
+    }
+
+    public String getFilterPath() {
+        return filterPath;
+    }
+
+    public void setFilterPath(String filterPath) {
+        this.filterPath = filterPath;
+    }
+
+    public String getCommandsPath() {
+        return commandsPath;
+    }
+
+    public void setCommandsPath(String commandsPath) {
+        this.commandsPath = commandsPath;
     }
 }

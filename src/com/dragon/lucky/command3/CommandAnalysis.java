@@ -44,8 +44,15 @@ public class CommandAnalysis {
                     case "-p"://输入预加载文件
                         command.setPreviewFilePath(args[++i]);
                         break;
+                    case "-m"://输入预加载文件
+                        command.setCommandsPath(args[++i]);
+                        break;
+                    case "-l"://输入预加载文件
+                        command.setReadLine(Integer.parseInt(args[++i]));
+                        break;
                     case "-c":
-                        byte[] checkData = new byte[args.length - i - 1];
+                        int len = Integer.parseInt(args[++i]);
+                        byte[] checkData = new byte[len];
                         for (int j = 0; j < checkData.length; j++) {
                             checkData[j] = Byte.parseByte(args[++i]);
                         }
@@ -54,7 +61,50 @@ public class CommandAnalysis {
                 }
             }
         } else {
-            Log.i("请输入操作指令，并以空格隔开：\n-i(输入原始数据文件)；\n-p（输入预加载文件）；\n-o（输出结果文件）;\n-c(校验文件中是否存在该数组)；");
+            Log.i("请输入操作指令，并以空格隔开：\n-i(输入原始数据文件)；\n-p（输入预加载文件）；\n-o（输出结果文件）;\n-l（每次处理条件长度）;\n-c(校验文件中是否存在该数组，-c后的第一位是校验数组的长度)；\n-m(多行命令输入，只对导入数组列表进行校验的操作有效)；");
+            Scanner scanner = new Scanner(System.in);
+            if (scanner.hasNext()) {
+                String commands = scanner.nextLine();
+                String[] commandSplit = commands.split(" ");
+                analysisCommand(commandSplit);
+                scanner.close();
+            }
+        }
+    }
+
+    //根据输入内容获取实际指令
+    public void analysisCommand(String[] args, CommandBean commandBean) {
+        if (args != null && args.length > 0) {
+            for (int i = 0; i < args.length; i++) {
+                String arg = args[i];
+                switch (arg) {
+                    case "-i"://输入原始数据
+                        commandBean.setInputPath(args[++i]);
+                        break;
+                    case "-o"://输出结果文件
+                        commandBean.setOutputPath(args[++i]);
+                        break;
+                    case "-p"://输入预加载文件
+                        commandBean.setPreviewFilePath(args[++i]);
+                        break;
+                    case "-m"://输入预加载文件
+                        commandBean.setCommandsPath(args[++i]);
+                        break;
+                    case "-l"://输入预加载文件
+                        commandBean.setReadLine(Integer.parseInt(args[++i]));
+                        break;
+                    case "-c":
+                        int len = Integer.parseInt(args[++i]);
+                        byte[] checkData = new byte[len];
+                        for (int j = 0; j < checkData.length; j++) {
+                            checkData[j] = Byte.parseByte(args[++i]);
+                        }
+                        commandBean.setCheckData(checkData);
+                        break;
+                }
+            }
+        } else {
+            Log.i("请输入操作指令，并以空格隔开：\n-i(输入原始数据文件)；\n-p（输入预加载文件）；\n-o（输出结果文件）;\n-l（每次处理条件长度）;\n-c(校验文件中是否存在该数组，-c后的第一位是校验数组的长度)；\n-m(多行命令输入，只对导入数组列表进行校验的操作有效)；");
             Scanner scanner = new Scanner(System.in);
             if (scanner.hasNext()) {
                 String commands = scanner.nextLine();

@@ -9,14 +9,16 @@ public class CommandBean {
     private int mergeCount;//多少位合并为一个标识头
     private int sizeCount;//条件组多少组分为一个线程处理
     private int arrayCount;//求交集组分割数量
+    private int readLine;//
     private byte[] checkData;
     private int generateSize;
     private int generateFilterType;
+    private String commandsPath;//批处理条件
 
     public CommandBean() {
         mergeCount = 4;
-        sizeCount = 60;
-        arrayCount = 2;
+        sizeCount = 3;
+        arrayCount = 10;
         generateFilterType = -1;
     }
 
@@ -90,5 +92,21 @@ public class CommandBean {
 
     public void setGenerateFilterType(int generateFilterType) {
         this.generateFilterType = generateFilterType;
+    }
+
+    public String getCommandsPath() {
+        return commandsPath;
+    }
+
+    public void setCommandsPath(String commandsPath) {
+        this.commandsPath = commandsPath;
+    }
+
+    public int getReadLine() {
+        return readLine;
+    }
+
+    public void setReadLine(int readLine) {
+        this.readLine = readLine;
     }
 }

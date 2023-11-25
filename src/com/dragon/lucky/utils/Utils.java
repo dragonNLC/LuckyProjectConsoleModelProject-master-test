@@ -3,6 +3,7 @@ package com.dragon.lucky.utils;
 import com.dragon.lucky.bean.PointBean;
 import com.dragon.lucky.bean.ResultBean;
 import com.dragon.lucky.bean.ResultBean2;
+import com.dragon.lucky.command14.NumberDataBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,9 +72,9 @@ public class Utils {
     public static int printCount2 = 0;//用来输出的标志位
 
     public static void combine_increase(List<Byte> data, int start, int[] result, int count, int NUM, int arr_len, List<ResultBean> resultData, long[] id, int mergeArr) {
-        if (id.length > 0) {
-            Log.i("生成组合数：" + id[id.length - 1]);
-        }
+//        if (id.length > 0) {
+//            Log.i("生成组合数：" + id[id.length - 1]);
+//        }
         int i = 0;
         for (i = start; i < arr_len + 1 - count; i++) {
             result[count - 1] = i;
@@ -92,7 +93,7 @@ public class Utils {
                     printCount++;
                     if (printCount >= 100) {
                         printCount = 0;
-                        Log.i("子运算次数加一(/100)");
+//                        Log.i("子运算次数加一(/100)");
                     }
                 }
                 id[0] += 1;
@@ -110,14 +111,58 @@ public class Utils {
         if (printCount2 >= 100) {
             printCount2 = 0;
             METHOD_COUNT++;
-            Log.i("运算次数(/100)：" + METHOD_COUNT);
+//            Log.i("运算次数(/100)：" + METHOD_COUNT);
+        }
+    }
+
+    public static void combine_increase_gdaf2(byte[] data, int start, int[] result, int count, int NUM, int arr_len, List<ResultBean> resultData, long[] id, int mergeArr) {
+//        if (id.length > 0) {
+//            Log.i("生成组合数：" + id[id.length - 1]);
+//        }
+        int i = 0;
+        for (i = start; i < arr_len + 1 - count; i++) {
+            result[count - 1] = i;
+            if (count - 1 == 0) {
+                int j;
+//                StringBuilder sb = new StringBuilder();
+                byte[] tempData = new byte[NUM];
+                for (j = NUM - 1; j >= 0; j--) {
+//                    sb.append(data.get(result[j]));
+//                    tempData.add(new PointBean(data.get(result[j]), PointBean.POINT_NONE));
+                    tempData[tempData.length - 1 - j] = data[result[j]];
+//                    tempData.add(data.get(result[j]));
+//                    if (j != 0) {
+//                        sb.append("、");
+//                    }
+                    printCount++;
+                    if (printCount >= 100) {
+                        printCount = 0;
+//                        Log.i("子运算次数加一(/100)");
+                    }
+                }
+                id[0] += 1;
+                if (mergeArr == -1) {
+                    resultData.add(new ResultBean(tempData, id[0]));
+                } else {
+                    resultData.add(new ResultBean(tempData, id[0], Math.min(mergeArr, NUM)));
+                }
+//                Log.e("TAG", sb.toString());
+            } else {
+                combine_increase_gdaf2(data, i + 1, result, count - 1, NUM, arr_len, resultData, id, mergeArr);
+            }
+        }
+        printCount2++;
+        if (printCount2 >= 100) {
+            printCount2 = 0;
+            METHOD_COUNT++;
+//            Log.i("运算次数(/100)：" + METHOD_COUNT);
         }
     }
 
     public static void combine_increase2(List<Byte> data, int start, int[] result, int count, int NUM, int arr_len, List<ResultBean2> resultData, long[] id) {
-        if (id.length > 0) {
-            Log.i("生成组合数：" + id[id.length - 1]);
-        }
+//        if (id.length > 0) {
+//            Log.i("生成组合数：" + id[id.length - 1]);
+//        }
         int i = 0;
         for (i = start; i < arr_len + 1 - count; i++) {
             result[count - 1] = i;
@@ -151,6 +196,111 @@ public class Utils {
             printCount2 = 0;
             METHOD_COUNT++;
             Log.i("运算次数(/100)：" + METHOD_COUNT);
+        }
+    }
+
+    public static void combine_increase_for_number(List<Integer> data, int start, int[] result, int count, int NUM, int arr_len, List<NumberDataBean> resultData) {
+        int i = 0;
+        for (i = start; i < arr_len + 1 - count; i++) {
+            result[count - 1] = i;
+            if (count - 1 == 0) {
+                int j;
+                int[] tempData = new int[NUM];
+                for (j = NUM - 1; j >= 0; j--) {
+                    tempData[tempData.length - 1 - j] = data.get(result[j]);
+                    printCount++;
+                    if (printCount >= 100) {
+                        printCount = 0;
+                    }
+                }
+                resultData.add(new NumberDataBean(tempData));
+            } else {
+                combine_increase_for_number(data, i + 1, result, count - 1, NUM, arr_len, resultData);
+            }
+        }
+        printCount2++;
+        if (printCount2 >= 100) {
+            printCount2 = 0;
+            METHOD_COUNT++;
+        }
+    }
+
+    public static void combine_increase_for_number(byte[] data, int start, int[] result, int count, int NUM, int arr_len, List<com.dragon.lucky.command15.NumberDataBean> resultData) {
+        int i = 0;
+        for (i = start; i < arr_len + 1 - count; i++) {
+            result[count - 1] = i;
+            if (count - 1 == 0) {
+                int j;
+                byte[] tempData = new byte[NUM];
+                for (j = NUM - 1; j >= 0; j--) {
+                    tempData[tempData.length - 1 - j] = data[result[j]];
+                    printCount++;
+                    if (printCount >= 100) {
+                        printCount = 0;
+                    }
+                }
+                resultData.add(new com.dragon.lucky.command15.NumberDataBean(tempData));
+            } else {
+                combine_increase_for_number(data, i + 1, result, count - 1, NUM, arr_len, resultData);
+            }
+        }
+        printCount2++;
+        if (printCount2 >= 100) {
+            printCount2 = 0;
+            METHOD_COUNT++;
+        }
+    }
+
+    public static void combine_increase_for_number27(byte[] data, int start, int[] result, int count, int NUM, int arr_len, List<com.dragon.lucky.command27.NumberDataBean> resultData) {
+        int i = 0;
+        for (i = start; i < arr_len + 1 - count; i++) {
+            result[count - 1] = i;
+            if (count - 1 == 0) {
+                int j;
+                byte[] tempData = new byte[NUM];
+                for (j = NUM - 1; j >= 0; j--) {
+                    tempData[tempData.length - 1 - j] = data[result[j]];
+                    printCount++;
+                    if (printCount >= 100) {
+                        printCount = 0;
+                    }
+                }
+                resultData.add(new com.dragon.lucky.command27.NumberDataBean(tempData));
+            } else {
+                combine_increase_for_number27(data, i + 1, result, count - 1, NUM, arr_len, resultData);
+            }
+        }
+        printCount2++;
+        if (printCount2 >= 100) {
+            printCount2 = 0;
+            METHOD_COUNT++;
+        }
+    }
+
+
+    public static void combine_increase_for_number_for_run19(byte[] data, int start, int[] result, int count, int NUM, int arr_len, List<ResultBean> resultData) {
+        int i = 0;
+        for (i = start; i < arr_len + 1 - count; i++) {
+            result[count - 1] = i;
+            if (count - 1 == 0) {
+                int j;
+                byte[] tempData = new byte[NUM];
+                for (j = NUM - 1; j >= 0; j--) {
+                    tempData[tempData.length - 1 - j] = data[result[j]];
+                    printCount++;
+                    if (printCount >= 100) {
+                        printCount = 0;
+                    }
+                }
+                resultData.add(new ResultBean(tempData, 0));
+            } else {
+                combine_increase_for_number_for_run19(data, i + 1, result, count - 1, NUM, arr_len, resultData);
+            }
+        }
+        printCount2++;
+        if (printCount2 >= 100) {
+            printCount2 = 0;
+            METHOD_COUNT++;
         }
     }
 

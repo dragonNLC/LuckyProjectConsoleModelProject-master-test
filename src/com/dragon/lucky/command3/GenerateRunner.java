@@ -7,9 +7,7 @@ import com.dragon.lucky.utils.Log;
 import com.dragon.lucky.utils.Utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GenerateRunner {
@@ -38,23 +36,45 @@ public class GenerateRunner {
             }
         }
         return sInstance;
+//        sInstance = new GenerateRunner();
+//        return sInstance;
     }
 
-    public static List<ResultBean> allGenerateData;
+    public List<ResultBean> allGenerateData;
 
-    public void run(CommandBean command) throws IOException {
+    private CallbackListener mCallBackListener;
+    private BaseGenerateNumberBean bgn = new BaseGenerateNumberBean();
+
+    public void run(CommandBean command, CallbackListener callbackListener) throws IOException {
+        this.mCallBackListener = callbackListener;
         this.mCommand = command;
-        if (CommandAnalysis.getInstance().getCommand().getCheckData() != null) {
+        this.currentLine = 0;
+        this.threadCount = 0;
+        this.compileThreadCount = 0;
+        this.compileData.clear();
+        this.threadName.clear();
+        this.threads.clear();
+        if (command.getCheckData() != null && Utils.isEmpty(command.getInputPath())) {
             List<ResultBean> printData = new ArrayList<>();
-            if (!FileReadHelper.checkFileExists(command.getInputPath())) {
+            if (!FileReadHelper.checkFileExists(command.getPreviewFilePath())) {
                 Log.i("导入文件不存在");
                 return;
             }
-            List<String> previewData = FileReadHelper.readFile(command.getInputPath());
+            List<String> previewData = FileReadHelper.readFile(command.getPreviewFilePath());
             List<ResultBean> previewResult = new ArrayList<>();
             for (int i = 0; i < previewData.size(); i++) {
                 String d = previewData.get(i);
-                String line = d.replace("[", "").replace("]", "");
+                if (!d.contains("[") || !d.contains("]")) {
+                    continue;
+                }
+                String line = "";
+                if (d.contains("],[")) {
+                    String[] content = d.split("],\\[");
+                    line = content[0].replace("[", "").replace("]", "");
+                } else {
+                    line = d.replace("[", "").replace("]", "");
+                }
+//                String line = d.replace("[", "").replace("]", "");
                 String[] splitLine = line.split(", ");
                 if (splitLine != null && splitLine.length > 0) {
 //                    Log.i("line = " + splitLine.length);
@@ -67,36 +87,97 @@ public class GenerateRunner {
                     previewResult.add(new ResultBean(splitLineInt, i, mCommand.getMergeCount()));
                 }
             }
-            int count = 0;
+            List<Integer> exists4 = new ArrayList<>();
+            List<Integer> exists5 = new ArrayList<>();
+            List<Integer> exists3 = new ArrayList<>();
+            List<Integer> exists2 = new ArrayList<>();
+            List<Integer> exists1 = new ArrayList<>();
             for (int i = 0; i < previewResult.size(); i++) {
                 ResultBean data = previewResult.get(i);
-                boolean exists = false;
+                int existsCount = 0;
                 for (int k = 0; k < mCommand.getCheckData().length; k++) {
                     for (int j = 0; j < data.getData().length; j++) {
                         if (mCommand.getCheckData()[k] == data.getData()[j]) {
-                            exists = true;
+                            existsCount++;
                             break;
-                        } else {
-                            exists = false;
                         }
                     }
-                    if (!exists) {
-                        break;
-                    }
                 }
-                if (exists) {
+                if (existsCount >= 1) {
+                    if (existsCount == 1) {
+                        exists1.add(i);
+                    } else if (existsCount == 2) {
+                        exists2.add(i);
+                    } else if (existsCount == 3) {
+                        exists3.add(i);
+                    } else if (existsCount == 4) {
+                        exists4.add(i);
+                    } else if (existsCount == 5) {
+                        exists5.add(i);
+                    }
                     count++;
                     printData.add(data);
-                    Log.i("第" + (i + 1) + "行存在对应的数据！存在：" + count + " 条");
                 }
             }
-            Log.i("校验完毕，结束！");
+            StringBuilder sb = new StringBuilder();
+            Log.i("出现5位个数：" + exists5.size());
+            sb.append("出现5位个数：").append(exists5.size());
+            sb.append("\n");
+            for (int i = 0; i < exists5.size(); i++) {
+//                Log.i("第" + (i + 1) + "行存在对应的数据！");
+                sb.append("第").append(exists5.get(i) + 1).append("行存在对应的数据！");
+                sb.append("\n");
+            }
+            Log.i("出现4位个数：" + exists4.size());
+            sb.append("出现4位个数：").append(exists4.size());
+            sb.append("\n");
+            for (int i = 0; i < exists4.size(); i++) {
+//                Log.i("第" + (i + 1) + "行存在对应的数据！");
+                sb.append("第").append(exists4.get(i) + 1).append("行存在对应的数据！");
+                sb.append("\n");
+            }
+            Log.i("出现3位个数：" + exists3.size());
+            sb.append("出现3位个数：").append(exists3.size());
+            sb.append("\n");
+            for (int i = 0; i < exists3.size(); i++) {
+//                Log.i("第" + (i + 1) + "行存在对应的数据！");
+                sb.append("第").append(exists3.get(i) + 1).append("行存在对应的数据！");
+                sb.append("\n");
+            }
+            Log.i("出现2位个数：" + exists2.size());
+            sb.append("出现2位个数：").append(exists2.size());
+            sb.append("\n");
+            for (int i = 0; i < exists2.size(); i++) {
+//                Log.i("第" + (i + 1) + "行存在对应的数据！");
+                sb.append("第").append(exists2.get(i) + 1).append("行存在对应的数据！");
+                sb.append("\n");
+            }
+            Log.i("出现1位个数：" + exists1.size());
+            sb.append("出现1位个数：").append(exists1.size());
+            sb.append("\n");
+            for (int i = 0; i < exists1.size(); i++) {
+//                Log.i("第" + (i + 1) + "行存在对应的数据！");
+                sb.append("第").append(exists1.get(i) + 1).append("行存在对应的数据！");
+                sb.append("\n");
+            }
+            Log.i("校验完毕，出现总条数：" + printData.size());
+            sb.append("\n");
+            sb.append("-----------------------结果：" + previewResult.size() + "条-----------------------------");
+            sb.append("\n");
+            for (int i = 0; i < previewResult.size(); i++) {
+                sb.append(Arrays.toString(previewResult.get(i).getData()));
+                sb.append("\n");
+            }
+
             if (mCommand.getOutputPath() != null && !mCommand.getOutputPath().equals("")) {
                 try {
-                    FileReadHelper.writeToFile(mCommand.getOutputPath(), printData);
+                    FileReadHelper.writeToFile(mCommand.getOutputPath(), sb.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+            if (mCallBackListener != null) {
+                mCallBackListener.onCompile();
             }
             return;
         }
@@ -109,7 +190,17 @@ public class GenerateRunner {
             List<ResultBean> previewResult = new ArrayList<>();
             for (int i = 0; i < previewData.size(); i++) {
                 String d = previewData.get(i);
-                String line = d.replace("[", "").replace("]", "");
+                if (!d.contains("[") || !d.contains("]")) {
+                    continue;
+                }
+//                String line = d.replace("[", "").replace("]", "");
+                String line = "";
+                if (d.contains("],[")) {
+                    String[] content = d.split("],\\[");
+                    line = content[0].replace("[", "").replace("]", "");
+                } else {
+                    line = d.replace("[", "").replace("]", "");
+                }
                 String[] splitLine = line.split(", ");
                 if (splitLine != null && splitLine.length > 0) {
 //                    Log.i("line = " + splitLine.length);
@@ -136,7 +227,6 @@ public class GenerateRunner {
 //                }
             }
             List<BaseControlNumberBean> bcnData = getBaseControlNumbers(cb);
-            BaseGenerateNumberBean bgn = new BaseGenerateNumberBean();
             if (bcnData == null) {
                 Log.i("参考数列表数据有误！");
                 return;
@@ -154,7 +244,6 @@ public class GenerateRunner {
                 return;
             }
             List<String> data = FileReadHelper.readFile(command.getInputPath());
-            BaseGenerateNumberBean bgn = new BaseGenerateNumberBean();
             if (data.size() > 1) {
                 HeadContentBean hcb = new HeadContentBean(data.get(0), data.get(1));
                 String baseNumber = hcb.getControl();
@@ -213,14 +302,22 @@ public class GenerateRunner {
         }
     }
 
+    private int currentLine;
+
     ///////////////////////////////////////////////
-    private List<Integer> generateResults(BaseGenerateNumberBean bgn, List<ResultBean> result) {
+    private void generateResults(BaseGenerateNumberBean bgn, List<ResultBean> result) {
         Log.i("result = " + result.size());
         List<Integer> resultBeans = new ArrayList<>();
 //        Log.e("TAG", "result = " + result.size());
         //拿到最终结果数，开始跟条件进行比对
         List<BaseControlNumberBean> controls = bgn.getBaseControlNumbers();
         if (controls.size() > 0) {
+            if (mCommand.getReadLine() > 0) {//每次处理行数
+                controls = controls.subList(currentLine, Math.min(currentLine + mCommand.getReadLine(), controls.size()));
+//                Log.i("currentLine????? = " + currentLine + "   " + mCommand.getReadLine());
+                currentLine = Math.min(currentLine + mCommand.getReadLine(), bgn.getBaseControlNumbers().size());
+//                Log.i("currentLine????? = " + currentLine);
+            }
             int sizeCount = mCommand.getSizeCount();
             int size = controls.size() / mCommand.getSizeCount();
             Log.i("size = " + size);
@@ -248,26 +345,199 @@ public class GenerateRunner {
                 }
             } else {
                 FilterUtils.filterResultBean(result, controls, 0, null, resultBeans);
-                try {
+                /*try {
                     FileReadHelper.writeToFile(mCommand.getOutputPath(), allGenerateData, resultBeans);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                */
+                printData(getResultBeans(allGenerateData, resultBeans));
+
                 Log.i(" 处理完成：结果数-" + resultBeans.size() /*+ "   " + resultBeans.toString()*/);
             }
         } else {
 //            resultBeans.addAll(result);
-            try {
+            /*try {
                 FileReadHelper.writeToFile(mCommand.getOutputPath(), result);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
+            printData(result);
             Log.i(" 处理完成：结果数-" + result.size()/* + "   " + resultBeans.toString()*/);
         }
-        return resultBeans;
     }
-    ///////////////////////////////////////////////
 
+    ///////////////////////////////////////////////
+    public List<ResultBean> getResultBeans(List<ResultBean> data, List<Integer> dataIdx) {
+        HashSet<Integer> complexData = new HashSet<>(dataIdx);
+        dataIdx.clear();
+        dataIdx.addAll(complexData);
+        dataIdx.sort(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+        });
+
+        StringBuilder sbs = new StringBuilder();
+        for (int i = 0; i < dataIdx.size(); i++) {
+            sbs.append(dataIdx.get(i) + "");
+            sbs.append("\n");
+        }
+        try {
+            FileReadHelper.writeToFile(mCommand.getOutputPath().split("\\.")[0] + "-x2.txt", sbs.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        dataIdx.sort(Integer::compareTo);
+        List<ResultBean> result = new ArrayList<>();
+        for (int i = 0; i < dataIdx.size(); i++) {
+            result.add(data.get(dataIdx.get(i)));
+        }
+        return result;
+    }
+
+    private void printData(List<ResultBean> previewResult) {
+        if (mCommand.getReadLine() > 0 && currentLine < bgn.getBaseControlNumbers().size()) {
+            Log.i("当前处理的条件长度：" + currentLine + "  总长度：" + bgn.getBaseControlNumbers().size());
+            threads.clear();
+            threadName.clear();
+            allGenerateData = previewResult;
+            generateResults(bgn, allGenerateData);
+            System.gc();
+            return;
+        }
+        if (mCommand.getCheckData() == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("-----------------------结果：" + previewResult.size() + "条-----------------------------");
+            sb.append("\n");
+            /*for (int i = 0; i < previewResult.size(); i++) {
+                sb.append(Arrays.toString(previewResult.get(i).getData()));
+                sb.append("\n");
+            }*/
+
+            if (mCommand.getOutputPath() != null && !mCommand.getOutputPath().equals("")) {
+                try {
+                    FileReadHelper.writeToFileForRun3(mCommand.getOutputPath(), sb.toString(), previewResult);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+//            List<ResultBean> printData = new ArrayList<>();
+           /* List<Integer> exists4 = new ArrayList<>();
+            List<Integer> exists5 = new ArrayList<>();
+            for (int i = 0; i < previewResult.size(); i++) {
+                ResultBean data = previewResult.get(i);
+                int existsCount = 0;
+                for (int k = 0; k < mCommand.getCheckData().length; k++) {
+                    for (int j = 0; j < data.getData().length; j++) {
+                        if (mCommand.getCheckData()[k] == data.getData()[j]) {
+                            existsCount++;
+                            break;
+                        }
+                    }
+                }
+                if (existsCount >= 4) {
+                    if (existsCount == 4) {
+                        exists4.add(i);
+                    } else {
+                        exists5.add(i);
+                    }
+                    count++;
+                    printData.add(data);
+                }
+            }
+            Log.i("出现5位个数：" + exists5.size());
+            sb.append("出现5位个数：").append(exists5.size());
+            sb.append("\n");
+            for (int i = 0; i < exists5.size(); i++) {
+//                Log.i("第" + (i + 1) + "行存在对应的数据！");
+                sb.append("第").append(exists5.get(i) + 1).append("行存在对应的数据！");
+                sb.append("\n");
+            }
+            Log.i("出现4位个数：" + exists4.size());
+            sb.append("出现4位个数：").append(exists4.size());
+            sb.append("\n");
+            for (int i = 0; i < exists4.size(); i++) {
+//                Log.i("第" + (i + 1) + "行存在对应的数据！");
+                sb.append("第").append(exists4.get(i) + 1).append("行存在对应的数据！");
+                sb.append("\n");
+            }*/
+            StringBuilder sb = new StringBuilder();
+            Log.i("校验完毕，出现总条数：" + previewResult.size());
+            sb.append("\n");
+            sb.append("-----------------------结果：" + previewResult.size() + "条-----------------------------");
+            int existsData1 = printSingleDataIdx(previewResult, 1);//先得到符合的数
+            int existsData2 = printSingleDataIdx(previewResult, 2);//先得到符合的数
+            int existsData3 = printSingleDataIdx(previewResult, 3);//先得到符合的数
+            int existsData4 = printSingleDataIdx(previewResult, 4);//先得到符合的数
+            int existsData5 = printSingleDataIdx(previewResult, 5);//先得到符合的数
+            sb.append("\n");/*
+            sb.append("中“1”位数量：" + existsData1);
+            sb.append("\n");
+            sb.append("中“2”位数量：" + existsData2);
+            sb.append("\n");
+            sb.append("中“3”位数量：" + existsData3);
+            sb.append("\n");
+            sb.append("中“4”位数量：" + existsData4);
+            sb.append("\n");
+            sb.append("中“5”位数量：" + existsData5);
+            sb.append("\n");*/
+
+            float percent1 = (existsData1 / (float) previewResult.size()) * 100;
+            sb.append("中“1”位数量：").append(existsData1).append("     ").append(String.format("%.2f", percent1)).append("%");
+            sb.append("\n");
+            float percent2 = (existsData2 / (float) previewResult.size()) * 100;
+            sb.append("中“2”位数量：").append(existsData2).append("     ").append(String.format("%.2f", percent2)).append("%");
+            sb.append("\n");
+            float percent3 = (existsData3 / (float) previewResult.size()) * 100;
+            sb.append("中“3”位数量：").append(existsData3).append("     ").append(String.format("%.2f", percent3)).append("%");
+            sb.append("\n");
+            float percent4 = (existsData4 / (float) previewResult.size()) * 100;
+            sb.append("中“4”位数量：").append(existsData4).append("     ").append(String.format("%.2f", percent4)).append("%");
+            sb.append("\n");
+            float percent5 = (existsData5 / (float) previewResult.size()) * 100;
+            sb.append("中“5”位数量：").append(existsData5).append("     ").append(String.format("%.2f", percent5)).append("%");
+            sb.append("\n");
+
+            /*for (int i = 0; i < previewResult.size(); i++) {
+                sb.append(Arrays.toString(previewResult.get(i).getData()));
+                sb.append("\n");
+            }*/
+
+            if (mCommand.getOutputPath() != null && !mCommand.getOutputPath().equals("")) {
+                try {
+                    FileReadHelper.writeToFileForRun3(mCommand.getOutputPath(), sb.toString(), previewResult);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (mCallBackListener != null) {
+            mCallBackListener.onCompile();
+        }
+    }
+
+    private int printSingleDataIdx(List<ResultBean> data, int existsCountStandard) {
+        int size = 0;
+        for (int i = 0; i < data.size(); i++) {
+            ResultBean d = data.get(i);
+            int existsCount = 0;
+            for (int k = 0; k < mCommand.getCheckData().length; k++) {
+                for (int j = 0; j < d.getData().length; j++) {
+                    if (mCommand.getCheckData()[k] == d.getData()[j]) {
+                        existsCount++;
+                        break;
+                    }
+                }
+            }
+            if (existsCount == existsCountStandard) {
+                size++;
+            }
+        }
+        return size;
+    }
 
     //获取条件数组列表
     private List<BaseControlNumberBean> getBaseControlNumbers(List<ControlBean> adapterData) {
@@ -346,11 +616,13 @@ public class GenerateRunner {
                 doContainThread();//筛选的线程超过一个，则需要求并集
             } else {
                 result.addAll(threads.get(0).resultBeans);
-                try {
+                threads.get(0).resultBeans.clear();
+                /*try {
                     FileReadHelper.writeToFile(mCommand.getOutputPath(), allGenerateData, result);
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
+                printData(getResultBeans(allGenerateData, result));
                 Log.i(threads.size() + " 处理完成：结果数-" + result.size());
             }
         }
@@ -447,23 +719,44 @@ public class GenerateRunner {
 
     public synchronized void containCompileData(List<Integer> data) {
         //求并集的线程结束，需要判断是否还有筛选的数据没有进行并集求解
+        Log.i("compileData = " + compileData.size());
         compileData.addAll(data);
         Log.i("单次计算结果数：" + data.size());
         compileThreadCount++;
 //        Log.i("compileThreadCount：" + compileThreadCount);
 //        Log.i("threadCount：" + threadCount);
         if (threadCount <= compileThreadCount) {
-            compileData.sort(Integer::compareTo);
+//            compileData.sort(Integer::compareTo);
             //这里进行判断，是不是已经执行到最后一个线程了
 //            Log.i("currentFilterThreadId：" + currentFilterThreadId);
 //            Log.i("threads.size()：" + threads.size());
             if (currentFilterThreadId >= threads.size()) {//最后一个了
                 Log.i("计算完成，结果数：" + compileData.size());
-                try {
+                /*try {
                     FileReadHelper.writeToFile(mCommand.getOutputPath(), allGenerateData, compileData);
                 } catch (IOException e) {
                     e.printStackTrace();
+                }*/
+                compileData.sort(new Comparator<Integer>() {
+                    @Override
+                    public int compare(Integer o1, Integer o2) {
+                        return o1.compareTo(o2);
+                    }
+                });
+                StringBuilder sbs = new StringBuilder();
+                for (int i = 0; i < compileData.size(); i++) {
+                    sbs.append(compileData.get(i) + "");
+                    sbs.append("\n");
                 }
+                try {
+                    FileReadHelper.writeToFile(mCommand.getOutputPath().split("\\.")[0] + "-x.txt", sbs.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.i("allGenerateData = " + allGenerateData.size());
+                printData(getResultBeans(allGenerateData, compileData));
+                Log.i("allGenerateData = " + allGenerateData.size());
+                //-m C:\Users\aptdev\Desktop\za\20231112\新run3-连9.txt
             } else {//执行下一次结果
 //                if (currentFilterThreadId >= 5 && currentFilterThreadId < 9) {
 //                for (int i = 0; i < compileData.size(); i++) {

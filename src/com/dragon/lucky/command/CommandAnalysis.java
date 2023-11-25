@@ -45,7 +45,8 @@ public class CommandAnalysis {
                         command.setPreviewFilePath(args[++i]);
                         break;
                     case "-c":
-                        byte[] checkData = new byte[args.length - i - 1];
+                        int len = Integer.parseInt(args[++i]);
+                        byte[] checkData = new byte[len];
                         for (int j = 0; j < checkData.length; j++) {
                             checkData[j] = Byte.parseByte(args[++i]);
                         }
@@ -54,7 +55,7 @@ public class CommandAnalysis {
                 }
             }
         } else {
-            Log.i("请输入操作指令，并以空格隔开：\n-i(输入原始数据文件)；\n-p（输入预加载文件）；\n-o（输出结果文件）;\n-c(校验文件中是否存在该数组)；");
+            Log.i("请输入操作指令，并以空格隔开：\n-i(输入原始数据文件)；\n-p（输入预加载文件）；\n-o（输出结果文件）;\n-c(校验文件中是否存在该数组，-c后的第一位是校验数组的长度)；");
             Scanner scanner = new Scanner(System.in);
             if (scanner.hasNext()) {
                 String commands = scanner.nextLine();
