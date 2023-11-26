@@ -87,8 +87,9 @@ public class GenerateRunner {
                     previewResult.add(new ResultBean(splitLineInt, i, mCommand.getMergeCount()));
                 }
             }
-            List<Integer> exists4 = new ArrayList<>();
+            List<Integer> exists6 = new ArrayList<>();
             List<Integer> exists5 = new ArrayList<>();
+            List<Integer> exists4 = new ArrayList<>();
             List<Integer> exists3 = new ArrayList<>();
             List<Integer> exists2 = new ArrayList<>();
             List<Integer> exists1 = new ArrayList<>();
@@ -114,12 +115,22 @@ public class GenerateRunner {
                         exists4.add(i);
                     } else if (existsCount == 5) {
                         exists5.add(i);
+                    } else if (existsCount == 6) {
+                        exists6.add(i);
                     }
                     count++;
                     printData.add(data);
                 }
             }
             StringBuilder sb = new StringBuilder();
+            Log.i("出现6位个数：" + exists6.size());
+            sb.append("出现6位个数：").append(exists6.size());
+            sb.append("\n");
+            for (int i = 0; i < exists6.size(); i++) {
+//                Log.i("第" + (i + 1) + "行存在对应的数据！");
+                sb.append("第").append(exists6.get(i) + 1).append("行存在对应的数据！");
+                sb.append("\n");
+            }
             Log.i("出现5位个数：" + exists5.size());
             sb.append("出现5位个数：").append(exists5.size());
             sb.append("\n");
@@ -473,6 +484,7 @@ public class GenerateRunner {
             int existsData3 = printSingleDataIdx(previewResult, 3);//先得到符合的数
             int existsData4 = printSingleDataIdx(previewResult, 4);//先得到符合的数
             int existsData5 = printSingleDataIdx(previewResult, 5);//先得到符合的数
+            int existsData6 = printSingleDataIdx(previewResult, 6);//先得到符合的数
             sb.append("\n");/*
             sb.append("中“1”位数量：" + existsData1);
             sb.append("\n");
@@ -499,6 +511,9 @@ public class GenerateRunner {
             sb.append("\n");
             float percent5 = (existsData5 / (float) previewResult.size()) * 100;
             sb.append("中“5”位数量：").append(existsData5).append("     ").append(String.format("%.2f", percent5)).append("%");
+            sb.append("\n");
+            float percent6 = (existsData6 / (float) previewResult.size()) * 100;
+            sb.append("中“6”位数量：").append(existsData6).append("     ").append(String.format("%.2f", percent6)).append("%");
             sb.append("\n");
 
             /*for (int i = 0; i < previewResult.size(); i++) {

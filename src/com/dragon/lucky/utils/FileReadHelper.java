@@ -233,7 +233,7 @@ public class FileReadHelper {
         return true;
     }
 
-    public static boolean writeToFile(String path, List<ResultBean> data, int w4, int w5) throws IOException {
+    public static boolean writeToFileRun6(String path, List<ResultBean> data, int w4, int w5, int w6) throws IOException {
         FileOutputStream fos = new FileOutputStream(path);
         data.sort(new Comparator<ResultBean>() {
             @Override
@@ -242,6 +242,8 @@ public class FileReadHelper {
             }
         });
         fos.write(("总数：" + data.size()).getBytes(StandardCharsets.UTF_8));
+        fos.write("\n".getBytes(StandardCharsets.UTF_8));
+        fos.write(("中6位：" + w6).getBytes(StandardCharsets.UTF_8));
         fos.write("\n".getBytes(StandardCharsets.UTF_8));
         fos.write(("中5位：" + w5).getBytes(StandardCharsets.UTF_8));
         fos.write("\n".getBytes(StandardCharsets.UTF_8));

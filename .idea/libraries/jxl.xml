@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="jxl">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../../../../../ANewAndroidProjects/NSYHFaceDetectProject-950Sys-master/modulePublic/common/libs/jxl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../安装包/jxl-run16.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -423,8 +423,9 @@ public class GenerateRunner {
 //            printSingleData(printData);
             List<ExistsDataBean> existsData4 = printSingleDataIdx(printData, 4);//先得到符合的数
             List<ExistsDataBean> existsData5 = printSingleDataIdx(printData, 5);//先得到符合的数
+            List<ExistsDataBean> existsData6 = printSingleDataIdx(printData, 6);//先得到符合的数
             try {
-                FileReadHelper.writeToFile(mCommand.getOutputPath(), printData, existsData4.size(), existsData5.size());
+                FileReadHelper.writeToFileRun6(mCommand.getOutputPath(), printData, existsData4.size(), existsData5.size(), existsData6.size());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -474,6 +475,7 @@ public class GenerateRunner {
 
         List<ExistsDataBean> existsData4 = printSingleDataIdx(previewResult, 4);//先得到符合的数
         List<ExistsDataBean> existsData5 = printSingleDataIdx(previewResult, 5);//先得到符合的数
+        List<ExistsDataBean> existsData6 = printSingleDataIdx(previewResult, 6);//先得到符合的数
         //输出4、5位的个数
         List<Integer> tempIdxData = new ArrayList<>();
         for (int i = 0; i < result.size(); i++) {
